@@ -1,7 +1,8 @@
+// This is the NEW, correct content for Tailwind CSS v4
 /** @type {import('postcss-load-config').Config} */
 const config = {
   plugins: {
-    tailwindcss: {},
+    '@tailwindcss/postcss': {}, // Use the correct plugin package
     autoprefixer: {},
   },
 };

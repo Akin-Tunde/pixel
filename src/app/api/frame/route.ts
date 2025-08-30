@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { FrameRequest, getFrameMessage } from '@farcaster/hub-rest';
+import { FrameRequest, getFrameMessage } from '@farcaster/hub-nodejs';;
 
 async function getResponse(req: NextRequest): Promise<NextResponse> {
   // We need to read the request body to get the frame message

@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { FrameRequest, getFrameMessage } from '@farcaster/hub-rest';
+import { FrameRequest, getFrameMessage } from '@farcaster/hub-nodejs';;
 import { ethers } from 'ethers';
-import { supabase } from '../../../lib/supabaseClient';
-import abi from '../../../lib/contract-abi.json';
+import {  supabaseAdmin as supabase } from '../../../lib/supabaseServerClient';
+import abi from '../../../lib/contract-abi';
 import Replicate from 'replicate';
 
 const CONTRACT_ADDRESS = process.env.PIXEL_MAP_CONTRACT_ADDRESS!;
@@ -261,11 +261,4 @@ await supabase.rpc('increment_pixel_balance', {
 }
 
 export const POST = handler;
-export const dynamic = 'force-dynamic';  } catch (error: any) {
-    console.error('Error processing transaction:', error.message);
-    return new NextResponse('Error: Could not process your request.', { status: 500 });
-  }
-}
-
-export const POST = handler;
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-dynamic'; 

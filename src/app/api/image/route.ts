@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '../../../lib/supabaseClient';
+import { supabaseAdmin as supabase } from '../../../lib/supabaseServerClient';
 import sharp from 'sharp';
 
 const MAP_DIMENSION = 100;
