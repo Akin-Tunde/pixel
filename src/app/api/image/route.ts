@@ -63,8 +63,10 @@ export async function GET() {
       headers: { 'Content-Type': 'image/png', 'Cache-Control': 'no-cache' },
     });
 
-  } catch (error: any) {
-    console.error(error.message);
+    } catch (error: unknown) {
+    // Type-safe error handling
+    const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
+    console.error(errorMessage);
     return new NextResponse('Error generating image', { status: 500 });
   }
 }
