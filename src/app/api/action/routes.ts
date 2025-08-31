@@ -45,7 +45,7 @@ function createResultFrame(text: string) {
 }
 
 async function handler(req: NextRequest): Promise<NextResponse> {
-    const body: any = await req.json();
+    const body = await req.json();
     
     const { isValid, message } = await getFrameMessage(body, { hubHttpUrl: "https://api.hub.wevm.dev" });
 
@@ -71,11 +71,14 @@ if (buttonIndex === 3) {
 
     try {
         // Find or create the community in the database
-        let { data: community, error: communityError } = await supabase
-            .from('communities')
-            .select('id')
-            .eq('name', channelName)
-            .single();
+        const communityResult = await supabase
+    .from('communities')
+    .select('id')
+    .eq('name', channelName)
+    .single();
+
+const communityError = communityResult.error;
+let community = communityResult.data;
 
         if (communityError && communityError.code !== 'PGRST116') throw communityError;
 
@@ -98,10 +101,10 @@ if (buttonIndex === 3) {
         if (upsertError) throw upsertError;
 
         return createResultFrame(`Successfully joined the ${channelName} community!`);
-    } catch (error: any) {
-        console.error("Error joining community:", error);
-        return createResultFrame("Error joining community.");
-    }
+    } } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "An unknown error occurred.";
+    console.error("Error joining community:", message);
+    return createResultFrame("Error joining community.");
 }
 
     // --- MODE SWITCH LOGIC (Button 2) ---
