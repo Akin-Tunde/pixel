@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { FrameRequest, getFrameMessage } from '@farcaster/hub-nodejs';;
+import { getFrameMessage } from '@farcaster/hub-nodejs';;
 import { ethers } from 'ethers';
 import {  supabaseAdmin as supabase } from '../../../lib/supabaseServerClient';
 import abi from '../../../lib/contract-abi';
@@ -45,8 +45,8 @@ function createResultFrame(text: string) {
 }
 
 async function handler(req: NextRequest): Promise<NextResponse> {
-    const body: FrameRequest = await req.json();
-
+    const body: any = await req.json();
+    
     const { isValid, message } = await getFrameMessage(body, { hubHttpUrl: "https://api.hub.wevm.dev" });
 
     if (!isValid || !message) {
