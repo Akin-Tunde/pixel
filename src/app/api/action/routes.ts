@@ -172,6 +172,23 @@ let community = communityResult.data;
 // WITH THIS CORRECTED VERSION:
 
 // --- AI ART GENERATION LOGIC (Button 4) ---
+        // --- CLAIM LOGIC ---
+        if (actionToPerform === 'claim') {
+            let randomX, randomY, isClaimed = true, attempts = 0;
+            while (isClaimed && attempts < 10) {
+                attempts++;
+                randomX = Math.floor(Math.random() * 100);
+                randomY = Math.floor(Math.random() * 100);
+                const { data, error } = await supabase.from('tiles').select('id').eq('x', randomX).eq('y', randomY).eq('season_id', activeSeasonId).single();
+                if (!data) isClaimed = false;
+                if (error && error.code !== 'PGRST116') throw error;
+            }
+            if (isClaimed) throw new Error("Could not find an available tile.");
+
+            const provider = new ethers.JsonRpcProvider(RPC_URL);
+            const wa// In src/app/api/action/routes.ts, find and replace this entire block:
+
+// --- AI ART GENERATION LOGIC (Button 4) ---
 if (buttonIndex === 4) {
     const artPrompt = message.input || '';
     if (artPrompt.length < 5) {
@@ -184,12 +201,14 @@ if (buttonIndex === 4) {
             .from('tiles')
             .select('id')
             .eq('owner_fid', userFid)
-            .eq('season_id', activeSeasonId) // Make sure it's in the current season
+            .eq('season_id', activeSeasonId)
             .order('created_at', { ascending: false })
             .limit(1)
             .single();
 
-        if (lastTileError || !lastTile) throw new Error("You don't own any tiles.");
+        if (lastTileError || !lastTile) {
+            throw new Error("You don't own any tiles to generate art for.");
+        }
 
         // 2. Call the Replicate API to generate a pixel art image
         const model = "pixelfly/pixel-art-xl:b4289657157a1b4566723af3747ba6a68f7b55f6534471a3377a06f363c45731";
@@ -217,27 +236,12 @@ if (buttonIndex === 4) {
         
         return createResultFrame("Art generated successfully!");
 
-    } catch (error: unknown) { // THIS CATCH BLOCK WAS MISSING
+    } catch (error: unknown) { // THIS ENTIRE CATCH BLOCK WAS MISSING
         const message = error instanceof Error ? error.message : "An unknown error occurred.";
         console.error("AI Art Generation Error:", message);
         return createResultFrame(`Error generating art: ${message}`);
     }
-}
-        // --- CLAIM LOGIC ---
-        if (actionToPerform === 'claim') {
-            let randomX, randomY, isClaimed = true, attempts = 0;
-            while (isClaimed && attempts < 10) {
-                attempts++;
-                randomX = Math.floor(Math.random() * 100);
-                randomY = Math.floor(Math.random() * 100);
-                const { data, error } = await supabase.from('tiles').select('id').eq('x', randomX).eq('y', randomY).eq('season_id', activeSeasonId).single();
-                if (!data) isClaimed = false;
-                if (error && error.code !== 'PGRST116') throw error;
-            }
-            if (isClaimed) throw new Error("Could not find an available tile.");
-
-            const provider = new ethers.JsonRpcProvider(RPC_URL);
-            const wallet = new ethers.Wallet(WALLET_PRIVATE_KEY, provider);
+}llet = new ethers.Wallet(WALLET_PRIVATE_KEY, provider);
             const contract = new ethers.Contract(CONTRACT_ADDRESS, abi, wallet);
             const tx = await contract.claimTile(userWalletAddress, randomX, randomY);
             await tx.wait();
