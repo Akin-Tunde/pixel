@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import {  getFrameMessage } from '@farcaster/hub-nodejs';;
 
 async function getResponse(req: NextRequest): Promise<NextResponse> {
-  const body: any = await req.json().catch(() => ({}));
+  const body = await req.json().catch(() => ({}));
   // Validate the message to safely access its contents
   const { message } = await getFrameMessage(body, {
       hubHttpUrl: "https://api.hub.wevm.dev",
