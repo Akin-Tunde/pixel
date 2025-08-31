@@ -1,10 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { FrameRequest, getFrameMessage } from '@farcaster/hub-nodejs';;
+import {  getFrameMessage } from '@farcaster/hub-nodejs';;
 
 async function getResponse(req: NextRequest): Promise<NextResponse> {
-  // We need to read the request body to get the frame message
-  const body: FrameRequest = await req.json().catch(() => ({})); 
-
+  const body: any = await req.json().catch(() => ({}));
   // Validate the message to safely access its contents
   const { message } = await getFrameMessage(body, {
       hubHttpUrl: "https://api.hub.wevm.dev",
