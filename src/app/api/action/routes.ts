@@ -166,6 +166,11 @@ let community = communityResult.data;
 // In /api/action/route.ts -> handler()
 // ...
 
+// In src/app/api/action/routes.ts
+
+// REPLACE THE ENTIRE BLOCK THAT STARTS WITH "if (buttonIndex === 4)"
+// WITH THIS CORRECTED VERSION:
+
 // --- AI ART GENERATION LOGIC (Button 4) ---
 if (buttonIndex === 4) {
     const artPrompt = message.input || '';
@@ -175,10 +180,6 @@ if (buttonIndex === 4) {
 
     try {
         // 1. Find the user's most recently claimed tile
-        const { data: seasonData, error: seasonError } = await supabase.from('seasons').select('id').eq('is_active', true).single();
-        if (seasonError || !seasonData) throw new Error("No active season found.");
-        const activeSeasonId = seasonData.id;
-
         const { data: lastTile, error: lastTileError } = await supabase
             .from('tiles')
             .select('id')
@@ -190,12 +191,12 @@ if (buttonIndex === 4) {
 
         if (lastTileError || !lastTile) throw new Error("You don't own any tiles.");
 
-        // 2. Call the Replicate API
+        // 2. Call the Replicate API to generate a pixel art image
         const model = "pixelfly/pixel-art-xl:b4289657157a1b4566723af3747ba6a68f7b55f6534471a3377a06f363c45731";
         const output = await replicate.run(model, { input: { prompt: `pixel art, ${artPrompt}` } });
         const generatedImageUrl = (output as string[])[0];
 
-        // 3. Upload the generated image to Supabase Storage
+        // 3. Upload the generated image from the URL to our Supabase Storage
         const imageResponse = await fetch(generatedImageUrl);
         const imageBlob = await imageResponse.blob();
         const filePath = `${userFid}/${lastTile.id}-${Date.now()}.png`;
@@ -206,23 +207,22 @@ if (buttonIndex === 4) {
         
         if (uploadError) throw uploadError;
 
-        // 4. Get the public URL
+        // 4. Get the public URL of the uploaded image
         const { data: { publicUrl } } = supabase.storage
             .from('tile-art')
             .getPublicUrl(filePath);
 
-        // 5. Update the tile record
+        // 5. Update the tile record in our database with the new image URL
         await supabase.from('tiles').update({ image_url: publicUrl }).eq('id', lastTile.id);
         
         return createResultFrame("Art generated successfully!");
 
-    } catch (error: unknown) {
-        const errorMessage = error instanceof Error ? error.message : "An unknown error occurred.";
-        console.error("AI Art Generation Error:", errorMessage);
-        return createResultFrame(`Error: ${errorMessage}`);
+    } catch (error: unknown) { // THIS CATCH BLOCK WAS MISSING
+        const message = error instanceof Error ? error.message : "An unknown error occurred.";
+        console.error("AI Art Generation Error:", message);
+        return createResultFrame(`Error generating art: ${message}`);
     }
 }
-        
         // --- CLAIM LOGIC ---
         if (actionToPerform === 'claim') {
             let randomX, randomY, isClaimed = true, attempts = 0;
